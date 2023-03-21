@@ -42,11 +42,11 @@ int main(){
 	GPIO0->PIN_CNF[24] = 1; //Row 4
 	GPIO0->PIN_CNF[19] = 1; //Row 5
 
-	GPIO0->PIN_CNF[28] = 0; //Col 1
-	GPIO0->PIN_CNF[11] = 0; //Col 2
-	GPIO0->PIN_CNF[31] = 0; //Col 3
-	GPIO1->PIN_CNF[5] = 0;  //Col 4
-	GPIO0->PIN_CNF[30] = 0; //Col 5 
+	GPIO0->PIN_CNF[28] = 1; //Col 1
+	GPIO0->PIN_CNF[11] = 1; //Col 2
+	GPIO0->PIN_CNF[31] = 1; //Col 3
+	GPIO1->PIN_CNF[5] = 1;  //Col 4
+	GPIO0->PIN_CNF[30] = 1; //Col 5 
 	
 	// Configure buttons (dere må sjekke selv hvilken GPIO modul de ulike knappene tilhører)
 	GPIO0->PIN_CNF[14] = 0; // button A 
@@ -57,9 +57,17 @@ int main(){
 
 		/* Check if button B is pressed;
 		 * turn on LED matrix if it is. */
-
+		if(!(GPIO0->IN & (1 << 23))) {
+			GPIO0->OUTSET = (1 << 21) | (1 << 22) | (1 << 15) | (1 << 24) | (1 << 19);
+			GPIO0->OUTCLR = (1 << 28) | (1 << 11) | (1 << 31) | (1 << 5) | (1 << 30);
+		}
 		/* Check if button A is pressed;
 		 * turn off LED matrix if it is. */
+		if(!(GPIO0->IN & (1 << 14))) {
+			GPIO0->OUTCLR = (1 << 21) | (1 << 22) | (1 << 15) | (1 << 24) | (1 << 19);
+			GPIO0->OUTSET = (1 << 28) | (1 << 11) | (1 << 31) | (1 << 5) | (1 << 30);
+
+		}
 
 		sleep = 10000;
 		while(--sleep);
