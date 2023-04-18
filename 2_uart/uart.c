@@ -44,12 +44,12 @@ typedef struct {
 void uart_init() {
 
     // Enable input and output on pin 8 and 29
-    GPIO0->PIN_CNF[8] = 0; // RXD
-    GPIO0->PIN_CNF[29] = 1; // TXD
+    GPIO1->PIN_CNF[8] = 1; // TXD
+    GPIO0->PIN_CNF[6] = 0; // RXD
 
-    // Set which pin 8 to RXD and pin 29 to TXD
-    UART_REG->PSEL_RXD = 0x8;
-    UART_REG->PSEL_TXD = 0x1D;
+    // Set which pin 8 to TXD and pin 6 to RXD
+    UART_REG->PSEL_RXD = 0x8 | (1 << 5);
+    UART_REG->PSEL_TXD = 0x6;
 
     // Set baudrate to 9600
     UART_REG->BAUDRATE = 0x00275000;
@@ -60,8 +60,9 @@ void uart_init() {
 
     // Enable UART
     UART_REG->ENABLE = 0x4;
-    // // Make UART recieve messages
-    // UART_REG->TASKS_STARTRX = 1;
+    
+    // Make UART recieve messages
+    UART_REG->TASKS_STARTRX = 1;
 
 }
 
@@ -71,14 +72,13 @@ void uart_send(char letter) {
     
 
     // Load data to be sent into register
-    uint32_t message = (uint32_t) letter;
+    UART_REG->TXD = letter;
 
-    // Wait for confirmation that the byte has been sent
-    for (int i = 4; i > 0; i--) {
-        UART_REG->TXD = message;
-        while ((UART_REG->EVENTS_TXDRDY & 0x1) == 0);
-        message = message >> 8;
-    };
+     // Wait for confirmation that the byte has been sent
+    while ((UART_REG->EVENTS_TXDRDY & 0x1) == 0);
+
+    // Disable TXD ready event
+    UART_REG->EVENTS_TXDRDY = 0;
 
     // Stop sending data
     UART_REG->TASKS_STOPTX = 1;
