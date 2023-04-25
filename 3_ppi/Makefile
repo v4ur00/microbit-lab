@@ -29,6 +29,8 @@ CFLAGS += --specs=nosys.specs -Wl,--gc-sections -T $(LINKER_SCRIPT)
 
 SOURCES += $(BUILD_DIR)/system_nrf52833.c
 SOURCES += $(BUILD_DIR)/gcc_startup_nrf52833.S
+SOURCES += ppi.c gpiote.c
+
 
 .PHONY: default flash clean
 
